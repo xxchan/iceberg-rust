@@ -32,7 +32,6 @@ use fnv::FnvHashSet;
 use futures::channel::mpsc::{channel, Sender};
 use futures::future::BoxFuture;
 use futures::{try_join, SinkExt, StreamExt, TryFutureExt, TryStreamExt};
-use itertools::Itertools;
 use parquet::arrow::arrow_reader::{ArrowPredicateFn, ArrowReaderOptions, RowFilter};
 use parquet::arrow::async_reader::{AsyncFileReader, MetadataLoader};
 use parquet::arrow::{ParquetRecordBatchStreamBuilder, ProjectionMask, PARQUET_FIELD_ID_META_KEY};
