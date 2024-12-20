@@ -119,7 +119,7 @@ impl MetadataTable for SnapshotsTable {
             parent_id.append_option(snapshot.parent_snapshot_id());
             manifest_list.append_value(snapshot.manifest_list());
             operation.append_value(snapshot.summary().operation.as_str());
-            for (key, value) in &snapshot.summary().additional_properties {
+            for (key, value) in &snapshot.summary().other {
                 summary.keys().append_value(key);
                 summary.values().append_value(value);
             }
