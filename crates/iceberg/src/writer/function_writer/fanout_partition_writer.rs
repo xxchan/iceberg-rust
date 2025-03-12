@@ -26,7 +26,7 @@ use arrow_row::OwnedRow;
 use arrow_schema::SchemaRef as ArrowSchemaRef;
 use itertools::Itertools;
 
-use crate::arrow::{schema_to_arrow_schema, RecordBatchPartitionSpliter};
+use crate::arrow::{schema_to_arrow_schema, RecordBatchPartitionSplitter};
 use crate::spec::{DataFile, PartitionSpecRef, SchemaRef};
 use crate::writer::{IcebergWriter, IcebergWriterBuilder};
 use crate::Result;
@@ -77,7 +77,7 @@ impl<B: IcebergWriterBuilder> IcebergWriterBuilder for FanoutPartitionWriterBuil
     type R = FanoutPartitionWriter<B>;
 
     async fn build(self) -> Result<Self::R> {
-        let partition_splitter = RecordBatchPartitionSpliter::new(
+        let partition_splitter = RecordBatchPartitionSplitter::new(
             &self.arrow_schema,
             self.table_schema.clone(),
             self.partition_specs,
@@ -91,10 +91,10 @@ impl<B: IcebergWriterBuilder> IcebergWriterBuilder for FanoutPartitionWriterBuil
 }
 
 /// The fanout partition writer.
-/// It will split the input record batch by the partition specs, and write the splitted record batches to the inner writers.
+/// It will split the input record batch by the partition specs, and write the split record batches to the inner writers.
 pub struct FanoutPartitionWriter<B: IcebergWriterBuilder> {
     inner_writer_builder: B,
-    partition_splitter: RecordBatchPartitionSpliter,
+    partition_splitter: RecordBatchPartitionSplitter,
     partition_writers: HashMap<OwnedRow, B::R>,
 }
 

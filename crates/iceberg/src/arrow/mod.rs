@@ -25,5 +25,5 @@ pub(crate) mod record_batch_transformer;
 mod value;
 pub use reader::*;
 pub use value::*;
-mod record_batch_partition_spliter;
-pub(crate) use record_batch_partition_spliter::*;
+mod record_batch_partition_splitter;
+pub(crate) use record_batch_partition_splitter::*;

@@ -119,8 +119,8 @@ pub(crate) fn convert_row_to_struct(
     Ok(struct_array)
 }
 
-/// The spliter used to split the record batch into multiple record batches by the partition spec.
-pub(crate) struct RecordBatchPartitionSpliter {
+/// The splitter used to split the record batch into multiple record batches by the partition spec.
+pub(crate) struct RecordBatchPartitionSplitter {
     partition_spec: PartitionSpecRef,
     schema: SchemaRef,
     projector: RecordBatchProjector,
@@ -128,7 +128,7 @@ pub(crate) struct RecordBatchPartitionSpliter {
     row_converter: RowConverter,
 }
 
-impl RecordBatchPartitionSpliter {
+impl RecordBatchPartitionSplitter {
     pub(crate) fn new(
         arrow_schema: &ArrowSchema,
         table_schema: SchemaRef,
@@ -137,7 +137,7 @@ impl RecordBatchPartitionSpliter {
         if partition_spec.fields().is_empty() {
             return Err(Error::new(
                 ErrorKind::DataInvalid,
-                "Fail to create partition spliter using empty partition spec",
+                "Fail to create partition splitter using empty partition spec",
             ));
         }
         let projector = RecordBatchProjector::new(
@@ -220,7 +220,7 @@ mod tests {
     use crate::spec::{NestedField, PartitionSpec, Schema, Transform, UnboundPartitionField};
 
     #[test]
-    fn test_record_batch_partition_spliter() {
+    fn test_record_batch_partition_splitter() {
         let schema = Schema::builder()
             .with_fields(vec![
                 NestedField::required(1, "id", Type::Primitive(crate::spec::PrimitiveType::Int))
@@ -245,12 +245,12 @@ mod tests {
             .unwrap()
             .build()
             .unwrap();
-        let partition_spliter = RecordBatchPartitionSpliter::new(
+        let partition_splitter = RecordBatchPartitionSplitter::new(
             &schema_to_arrow_schema(&schema).unwrap(),
             Arc::new(schema),
             Arc::new(partition_spec),
         )
-        .expect("Failed to create spliter");
+        .expect("Failed to create splitter");
 
         let schema = Arc::new(ArrowSchema::new(vec![
             Field::new("id", DataType::Int32, false),
@@ -264,7 +264,7 @@ mod tests {
         ])
         .expect("Failed to create RecordBatch");
 
-        let mut partitioned_batches = partition_spliter
+        let mut partitioned_batches = partition_splitter
             .split(&batch)
             .expect("Failed to split RecordBatch");
         assert_eq!(partitioned_batches.len(), 3);
@@ -303,7 +303,7 @@ mod tests {
             assert_eq!(partitioned_batches[2].1, expected_batch);
         }
 
-        let partition_values = partition_spliter
+        let partition_values = partition_splitter
             .convert_row(
                 partitioned_batches
                     .iter()
@@ -320,7 +320,7 @@ mod tests {
     }
 
     #[test]
-    fn test_record_batch_partition_spliter_with_extra_columns() {
+    fn test_record_batch_partition_splitter_with_extra_columns() {
         let schema = Schema::builder()
             .with_fields(vec![
                 NestedField::required(1, "id", Type::Primitive(crate::spec::PrimitiveType::Int))
@@ -373,14 +373,14 @@ mod tests {
             Arc::new(extra_column2_array),
         ])
         .expect("Failed to create RecordBatch");
-        let partition_spliter = RecordBatchPartitionSpliter::new(
+        let partition_splitter = RecordBatchPartitionSplitter::new(
             &arrow_schema,
             Arc::new(schema),
             Arc::new(partition_spec),
         )
-        .expect("Failed to create spliter");
+        .expect("Failed to create splitter");
 
-        let mut partitioned_batches = partition_spliter
+        let mut partitioned_batches = partition_splitter
             .split(&batch)
             .expect("Failed to split RecordBatch");
         assert_eq!(partitioned_batches.len(), 3);
@@ -433,7 +433,7 @@ mod tests {
             assert_eq!(partitioned_batches[2].1, expected_batch);
         }
 
-        let partition_values = partition_spliter
+        let partition_values = partition_splitter
             .convert_row(
                 partitioned_batches
                     .iter()
@@ -468,7 +468,7 @@ mod tests {
             .with_spec_id(1)
             .build()
             .unwrap();
-        assert!(RecordBatchPartitionSpliter::new(
+        assert!(RecordBatchPartitionSplitter::new(
             &schema_to_arrow_schema(&schema).unwrap(),
             Arc::new(schema),
             Arc::new(partition_spec),
